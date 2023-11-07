@@ -1,0 +1,17 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px;
+}
+
+@media (min-width: 768px) {
+  .dashboard {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .chartContainer {
+    flex: 1 1 50%; /* Each chart will take up half the width on larger screens */
+  }
+}
