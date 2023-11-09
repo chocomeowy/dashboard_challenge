@@ -35,19 +35,34 @@ interface WeatherData {
 
 export const useWeather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(true); // Add a loading state
+  const [error, setError] = useState(null); // Add an error state
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Begin loading
+      setError(null); // Reset errors
       try {
         const result = await axios.get('https://api.open-meteo.com/v1/forecast?latitude=1.29&longitude=103.85&hourly=relativehumidity_2m,direct_radiation&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FSingapore&start_date=2023-10-01&end_date=2023-10-10');
+        await axios.post('http://localhost:3001/weather', result.data);
         setWeatherData(result.data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching weather data:', error);
+        try {
+          const localResult = await axios.get('http://localhost:3001/weather');
+          setWeatherData(localResult.data);
+        } catch (localError) {
+          console.error('Error fetching weather data from local server:', localError);
+        }
+        finally {
+          setLoading(false); // End loading regardless of success or error
+        }
       }
     };
 
     fetchData();
   }, []);
 
-  return weatherData;
+  return  { weatherData, loading, error };
 };

@@ -1,7 +1,5 @@
-// src/components/RadiationChart.tsx
 import { Line } from "react-chartjs-2";
 import styles from "./RadiationChart.module.css";
-import { useWeather } from "../hooks/useWeather";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -25,20 +23,51 @@ ChartJS.register(
   Filler
 );
 
-const RadiationChart = () => {
-  const weatherData = useWeather();
+interface WeatherData {
+  latitude: number;
+  longitude: number;
+  generationtime_ms: number;
+  utc_offset_seconds: number;
+  timezone: string;
+  timezone_abbreviation: string;
+  elevation: number;
+  hourly_units: {
+    time: string;
+    relativehumidity_2m: string;
+    direct_radiation: string;
+  };
+  hourly: {
+    time: string[];
+    relativehumidity_2m: number[];
+    direct_radiation: number[];
+  };
+  daily_units: {
+    time: string;
+    temperature_2m_max: string;
+    temperature_2m_min: string;
+  };
+  daily: {
+    time: string[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+  };
+}
 
-  if (!weatherData) {
-    return <div>Loading...</div>;
-  }
+// Define the props interface
+interface RadiationChartProps {
+  data: WeatherData; // Make sure WeatherData is defined and imported if it's in a separate file
+}
 
-  const labels = weatherData.hourly.time;
-  const data = {
+const RadiationChart = ({ data }: RadiationChartProps) => {
+  // No need to call useWeather here since we're now receiving the weather data via props
+
+  const labels = data.hourly.time;
+  const chartData = {
     labels: labels,
     datasets: [
       {
         label: "Direct Radiation",
-        data: weatherData.hourly.direct_radiation,
+        data: data.hourly.direct_radiation,
         borderColor: "rgb(255, 205, 86)",
         backgroundColor: "rgba(255, 205, 86, 0.5)",
         fill: true,
@@ -56,7 +85,7 @@ const RadiationChart = () => {
 
   return (
     <div className={styles.chartContainer}>
-      <Line data={data} options={options} />
+      <Line data={chartData} options={options} />
     </div>
   );
 };
